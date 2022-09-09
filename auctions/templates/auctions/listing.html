@@ -1,0 +1,107 @@
+{% extends 'auctions/layout.html' %}
+{% load humanize %}
+{% load crispy_forms_tags %}
+{% block title %} {{title.title}} {% endblock %}
+
+
+{% block body %}
+    {% for list in listing %}
+        <div class="container-fluid mt-5 d-flex ">
+            <div class="d-flex flex-column-center " style="width: 50%;;">
+                <img class="img-fluid m-auto" src="{{list.image}}" alt="{{list.title}}">
+            </div>
+            <div class="container" style="width: 55%;">
+                <div>
+                    <h2 class="border-bottom">{{list.title}} {%if list.active == False%}(Closed){%endif%}</h2>
+                    {% if list.owner != request.user and list.active == True %}
+                    <p>Listed by: {{list.owner}}</p>
+
+                        {% if user.is_authenticated or list not in my_watchlist.listings.all %}
+                            <a class="btn btn-secondary"href="{% url 'watchlist' list.id %}">Add Watchlist</a>
+                        {%else%}
+                            <p class="alert alert-warning"><a class="alert-link" href="{% url 'register' %}">Sign up</a> 
+                                or <a class="alert-link" href="{% url 'login' %}">Log in</a> to add it to the watchlist and bid.</p>                
+                        {% endif %}   
+                    {% endif %}
+                    
+                </div>
+                
+                <p class="text-justify mt-3" style="font-size: 19px;" class="mt-4 text-2">{{list.description}}</p>
+                <p style="font-size: 25px;">Price: ${{list.starting_bid | intcomma}}</p>
+                
+                <!-- Bid -->
+                {% if user.is_authenticated and list.owner != request.user and list.active == True%}
+                    <div class="w-75">
+
+                        <!-- message for the Last bid greater than current bid  -->
+                        {% if messages %}
+                            {% for message in messages %}
+                                    <p class='alert {% if message.tags == "success" %}alert-success {% else %}alert-danger{% endif %}'>{{ message|safe }}</p>
+                            {% endfor %}
+                        {% endif %}
+
+                        <!-- information about bids and form -->
+                        
+                        <form action="{% url 'bid' list.id %}" method="POST"> 
+                            {% csrf_token %}
+                            <label for="bid">{{totalBids}} bid(s) so far. Current Bid
+                            <strong>${{last_bid.bid}}</strong></label>
+                            
+                            
+                            <p>Your bid: ${{me.bid}} </p>
+                            
+                            {{form | crispy}}
+                            <input type="submit" class="btn btn-primary" value="Place bid">
+                        </form>
+                    </div>
+
+                <!-- Bid information for owner -->
+                {%else%}
+                <p><strong>{{totalBids}}</strong> bid(s) so far.
+                The current bid is ${{last_bid.bid}}</p>
+                    
+                {% endif %}
+
+                {% if list.owner == request.user and list.active == True %}
+                    <a class="btn btn-danger" href="{% url 'close-list' list.id %}">Close Auction</a>
+                {% endif  %}
+
+                {% if list.active == False %}
+                    {% if last_bid.bidder == request.user %}
+                        <h4>You are Winner</h4>
+                    {% else %}
+                        <h4>The Winner is <strong>{{last_bid.bidder}}</strong></h4>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        <hr style="width: 90%;">
+        
+        <!-- form for comments -->
+        
+        <div class="container-sm mb-5">
+            <h2>Comments</h2>
+            <form class="mb-5" method="POST" action="{% url 'comment' list.id %}">
+                {% csrf_token %}
+                <div class="w-75 d-flex">
+                    <textarea style="resize: none;"
+                    class="form-control" placeholder="Write a comment" name="comment" cols="50" rows="1"></textarea>
+                    <input class="btn btn-primary ml-3 px-3" type="submit" value="Send">   
+                </div>
+            </form>
+            
+
+            {% for comment in comments  %}
+                <div class="card mb-3 mt-4 w-75 shadow-sm ">
+                    <div class="card-header">{{comment.user}}</div>
+                    <div class="card-body">
+                        <p class="card-text">{{comment.comment}}</p>
+                    </div>
+                </div> 
+            {% endfor %}
+                                 
+        </div>
+            
+
+    {% endfor %}
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'auctions/layout.html' %}
+{%load humanize%}
+
+{% load static %}
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'auctions/index.css' %}">
+{% endblock %}
+
+{% block title %} Categories {% endblock %}
+
+{% block body %} 
+
+    <div class="container">        
+        <div class="d-flex justify-content-between flex-wrap flex-row pt-3">
+          {% for auction in auctions %}
+            {% if auction.active %}
+              <div class="card mb-5" style="width: 19.9rem;">
+                <div class="container-img">
+                  <img class="image" src="{{auction.image}}" alt="{{auction.title}}">
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title border-bottom border-secondary pb-2">{{auction.title}}</h5>
+                  <p class="card-text">{{auction.description | truncatewords:15}}</p>
+                  <p class="card-text"><strong>Price:</strong> ${{auction.starting_bid | intcomma}}</p>
+                </div>
+                <div class="p-3">
+                  <a href="{% url 'listing' auction.id %}" class="btn btn-outline-primary">More details</a>
+                </div>
+              </div>
+            {% endif %}
+
+          {% empty %}
+              <h1>Not entries</h1>
+          {% endfor %}
+        </div>
+    </div>
+{% endblock %}

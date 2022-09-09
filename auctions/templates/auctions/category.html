@@ -1,0 +1,25 @@
+{% extends 'auctions/layout.html' %}
+
+{% block title %} Categories {% endblock %}
+
+{% block body %} 
+    <div class="container pt-3">
+        <h1 class="text-center">Categories</h1>
+        <hr>
+        <div class="d-flex justify-content-between flex-wrap flex-row pt-3">
+            {% for numCategory, category in categories.items %}
+                <div class="card mb-5 shadow-sm" style="width: 19.9rem;">
+                    <div class="card-body">
+                        <h4 class="card-title text-center">{{category}}</h4>           
+                        <a href="{% url 'showCategories' numCategory %}" class="btn w-100 btn-outline-primary">Enter</a>
+                    </div>
+                </div>
+            {% endfor %}
+    
+        </div>
+    </div>
+
+
+    
+
+{% endblock %}

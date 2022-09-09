@@ -1,0 +1,52 @@
+{% extends 'auctions/layout.html' %}
+{% block title %} My Watchlist {% endblock %}
+
+{% load humanize %}
+
+
+
+{% block body %}
+    <div class="container mt-3">
+        <h1 class="text-center">My Watchlist</h1>
+        <hr>
+        <table class="table text-center">
+            <thead class="table-dark">
+              <tr>
+                <th scope="col">Image</th>
+                <th scope="col">Title</th>
+                <th scope="col">Bid</th>
+                <th scope="col">Active</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for watchlist in my_watchlist.listings.all %}
+                <tr> 
+                    <td class="w-25" >
+                        <div class=" rounded mx-auto d-block" style="min-width: 200px; min-height: 150px;
+                        max-width: 200px; max-height: 150px;"><img class="img-fluid" src="{{watchlist.image}}" alt="{{watchlist.title}}"></div>
+                    </td>
+                    <td class="py-5">{{watchlist.title}}</td>
+                    <td class="py-5">${{watchlist.starting_bid | intcomma}}</td>
+                    <td class="py-5">
+                        {% if watchlist.active %}
+                            <div style="width: 25px; height: 25px;" class=" m-auto bg-success rounded-circle"></div>
+                        {% else %}
+                            <div style="width: 25px; height: 25px;" class=" m-auto bg-danger rounded-circle"></div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a class="btn btn-primary my-4" href="{% url 'listing' watchlist.id %}">View</a>
+                        <a class="btn btn-danger my-4" href="{% url 'watchlistRemove' watchlist.id %}">Remove</a>
+                    </td>
+
+                   
+                </tr>
+
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+        
+
+{% endblock %}
